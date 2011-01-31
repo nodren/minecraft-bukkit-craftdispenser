@@ -1,0 +1,3 @@
+name: CraftDispenser
+main: com.echo28.bukkit.craftdispenser.CraftDispenser
+version: 1.0
