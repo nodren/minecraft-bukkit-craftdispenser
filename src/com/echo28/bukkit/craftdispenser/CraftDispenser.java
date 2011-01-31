@@ -166,7 +166,9 @@ public class CraftDispenser extends JavaPlugin
 		// Repair wood tools
 		WOOD_REPAIR("WoodRepair"),
 		// Hell Blocks
-		HELL_BLOCKS("HellBlocks");
+		HELL_BLOCKS("HellBlocks"),
+		// Custom recipes
+		CONFIG("Config");
 
 		private final String className;
 
