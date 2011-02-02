@@ -1,0 +1,11 @@
+#item to spit out if crafted successfully
+craft:
+    - torch * 4
+
+#vertical example, will make a torch with coal and a stick
+#the vertical items will be matched anywhere in the grid
+#there can be 2 or 3 items in a vertical recipe
+input-items-vertical:
+    - coal
+    - stick
+

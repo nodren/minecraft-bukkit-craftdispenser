@@ -1,0 +1,17 @@
+
+craft:
+    - netherrack * 8
+
+input-items:
+    - cobblestone  #top left box
+    - cobblestone  #top middle box
+    - cobblestone  #top right box
+    
+    - cobblestone  #middle left box
+    - sulphur       #middle middle box
+    - cobblestone  #middle right box
+    
+    - cobblestone  #bottom left box
+    - cobblestone  #bottom middle box
+    - cobblestone  #bottom right box
+

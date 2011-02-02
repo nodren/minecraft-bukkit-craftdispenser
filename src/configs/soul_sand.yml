@@ -1,0 +1,30 @@
+
+craft:
+    - soulsand * 8
+
+input-items:
+    - dirt
+    - dirt
+    - dirt
+    
+    - dirt
+    - water bucket
+    - dirt
+    
+    - dirt
+    - dirt
+    - dirt
+
+output-items:
+    - 0
+    - 0
+    - 0
+    
+    - 0
+    - bucket
+    - 0
+    
+    - 0
+    - 0
+    - 0
+

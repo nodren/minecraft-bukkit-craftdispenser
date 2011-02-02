@@ -1,0 +1,24 @@
+
+#custom example, a chest
+
+craft:
+     # item(s) to spit out if crafted successfully
+     # [brackets] mean optional
+     # item[.data][,damage][*amount]
+    - chest
+
+
+#order is from left to right then top to bottom
+input-items:
+    - wood  #top left box
+    - wood  #top middle box
+    - wood  #top right box
+    
+    - wood  #middle left box
+    - 0     #middle middle box
+    - wood  #middle right box
+    
+    - wood  #bottom left box
+    - wood  #bottom middle box
+    - wood  #bottom right box
+

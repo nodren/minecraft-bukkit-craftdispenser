@@ -1,0 +1,9 @@
+
+craft:
+    - glowstone
+
+input-items-vertical:
+    - sand
+    - torch
+    - netherrack
+
