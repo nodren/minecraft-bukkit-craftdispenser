@@ -1,12 +1,17 @@
 package com.echo28.bukkit.craftdispenser;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.material.MaterialData;
 
 /**
  *
@@ -14,7 +19,9 @@ import org.bukkit.inventory.PlayerInventory;
  */
 public class Items {
 	
-	public static iProperty Items = new iProperty("items.db");
+	public static Logger log = Logger.getLogger("Items");
+	
+	public static iProperty ItemsiProp = new iProperty("items.db");
 	public static HashMap<String, String> items;
 	
     public Items() { }
@@ -28,7 +35,7 @@ public class Items {
 		items = new HashMap<String, String>();
 	
 		try {
-			mappedItems = Items.returnMap();
+			mappedItems = ItemsiProp.returnMap();
 		} catch (Exception ex) {
 			System.out.println("[CraftDispenser Flatfile] could not open items.db!");
 			ex.printStackTrace();
@@ -45,21 +52,21 @@ public class Items {
 					//log.info("matches");
 					if(right.contains(",")) {
 						String[] synonyms = right.split(",");
-						itemName = synonyms[0].replaceAll("\\s","");
-						items.put(id, itemName);
-						//log.info("Added " + id + "=" + itemName);
+						itemName = synonyms[0].toLowerCase().replaceAll("\\s+", "");
+						items.put(itemName, id);
+						//log.info("Added " + itemName + "=" + id);
 						for(int i = 1; i < synonyms.length; i++) {
-							itemName = synonyms[i].replaceAll("\\s","");
+							itemName = synonyms[i].toLowerCase().replaceAll("\\s+", "");
 							items.put(itemName, id);
 							//log.info("Added " + itemName + "=" + id);
 						}
 					} else {
-						itemName = right.replaceAll("\\s","");
-						items.put(id, itemName);
-						//log.info("Added " + id + "=" + itemName);
+						itemName = right.toLowerCase().replaceAll("\\s+", "");
+						items.put(itemName, id);
+						//log.info("Added " + itemName + "=" + id);
 					}
 				} else {
-					itemName = left.replaceAll("\\s","");
+					itemName = left.toLowerCase().replaceAll("\\s+", "");
 					id = right.trim();
 					items.put(itemName, id);
 					//log.info("Added " + itemName + "=" + id);
@@ -101,7 +108,7 @@ public class Items {
      */
     public static void setName(String id, String name) {
     	items.put(id, name);
-    	Items.setString(id, name);
+    	ItemsiProp.setString(id, name);
     }
 
     /**
@@ -211,15 +218,92 @@ public class Items {
 		    }
 		}
     }
+    
+    public static ItemStack createItemStack(int[] item) {
+    	return new ItemStack(item[0], item[3], (short)item[2], item[1] == -1? null : new Byte((byte)item[1]));
+    }
+    public static ItemStack[] createItemStacks(int[][] items) {
+    	ItemStack[] itemstacks = new ItemStack[items.length];
+    	
+    	for (int i = 0; i < items.length; i++)
+    		itemstacks[i] = createItemStack(items[i]);
+    	
+    	return itemstacks;
+    }
+    
+    public static int[][] parseItemList(List<String> itemsList)
+	{
+		int[][] items = new int[itemsList.size()][];
+		
+		for (int i = 0; i < itemsList.size(); i++)
+			items[i] = parseItem(itemsList.get(i));
+		
+		return items;
+	}
+	
+	/*public static int[] parseItem(String item) {
+		int numItems = 1;
+		int damage = -1;
+		if (item.indexOf(':') != -1) {
+			String[] parts = item.split(":");
+			item = parts[0];
+			numItems = Integer.parseInt(parts[1]);
+			if (parts.length > 2)
+				damage = Integer.parseInt(parts[2]);
+		}
+		int[] itemID = validate(item);
+		return new int[] {itemID[0], itemID[1], numItems, damage};
+	}*/
+	
+	public static boolean itemMatchesStack(int[] item, ItemStack itemstack) {
+		if (itemstack.getTypeId() == item[0] && itemstack.getAmount() >= item[3]) {
+			MaterialData matdat = itemstack.getData();
+			if (matdat == null || matdat.getData() == item[1]) 
+				return true;
+		}
+		return false;
+	}
 
     /**
      * Validate the string for an item
      *
-     * @param item
-     * @return -1 if false, id if true.
+     * @param itemStr
+     * @return {id, data, damage, amount}
      */
-    public static int[] validate(String item) {
-		int[] ret = new int[]{-1, 0};
+	private static Pattern itemPattern = Pattern.compile("([a-zA-Z ]+|\\d+)(?:\\s*\\.\\s*(\\d+))?(?:\\s*,\\s*(\\d+))?(?:\\s*\\*\\s*(\\d+))?");
+    public static int[] parseItem(String itemStr) {
+    	Matcher m = itemPattern.matcher(itemStr);
+    	
+    	int[] ret = new int[] {-1, -1, 0, 1};
+    	
+    	if (m.matches()) {
+    		String type = m.group(1);
+    		try {
+    			ret[0] = Integer.parseInt(type);
+    		} catch (NumberFormatException e) {
+    			type = type.toLowerCase().replaceAll("\\s+", "");
+    			String id = items.get(type);
+    			try {
+    				ret[0] = Integer.parseInt(id);
+    			} catch (NumberFormatException e2) {
+    				System.out.printf("Fail '%s' '%s'\n", type, id);
+    			}
+    		}
+    		for (int i = 1; i < 4; i++) {
+    			try {
+    				ret[i] = Integer.parseInt(m.group(i+1));
+    			} catch (NumberFormatException e) {
+    				// do nothing
+    			}
+    		}
+    		//System.out.printf("Matched '%s': {%d, %d, %d, %d}\n", itemStr, ret[0], ret[1], ret[2], ret[3]);
+    	} else {
+    		System.out.printf("Unknown item '%s'\n", itemStr);
+    	}
+    	
+    	return ret;
+    }
+		/*int[] ret = new int[]{-1, -1};
 		
 		item = item.replaceAll("\\s+", "");
 		
@@ -244,21 +328,21 @@ public class Items {
 				try {
 					ret[0] = Integer.valueOf(split[0]);
 				} catch(NumberFormatException e2) {
-					System.out.printf("1: %s, %s\n", val, split[0]);
+					//System.out.printf("1: %s, %s\n", val, split[0]);
 					ret[0] = -1;
 				}
 				try {
 					ret[1] = Integer.valueOf(split[1]);
 				} catch(NumberFormatException e2) {
-					System.out.printf("2: %s, %s\n", val, split[0]);
+					//System.out.printf("2: %s, %s\n", val, split[0]);
 					ret[1] = 0;
 				}
 			} else {
 				try {
 					ret[0] = Integer.valueOf(val);
 				} catch(NumberFormatException e2) {
-					System.out.printf("3: '%s' '%s'\n", val, item);
-					e2.printStackTrace();
+					//System.out.printf("3: '%s' '%s'\n", val, item);
+					//e2.printStackTrace();
 					ret[0] = -1;
 				}
 			}
@@ -274,7 +358,7 @@ public class Items {
 		} else {
 			return ret;
 		}
-    }
+    }*/
 
     /**
      * Validate the string for an item

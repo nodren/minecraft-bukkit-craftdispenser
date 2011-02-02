@@ -54,7 +54,7 @@ public class CraftRepair extends Craft
 		
 		
 		if (plugin.repairStone) {
-			if (makeTools(Material.STONE, 
+			if (makeTools(Material.COBBLESTONE, 
 					new Material[] {Material.STONE_PICKAXE, Material.STONE_SPADE, 
 									Material.STONE_AXE, Material.STONE_SWORD, Material.STONE_HOE}))
 				return true;
@@ -93,21 +93,19 @@ public class CraftRepair extends Craft
 	private boolean tools(Material type, Material tool)
 	{
 		int[][] items = {
-				{type.getId(), 0, 1, -1},
-				{tool.getId(), 0, 1, -1},
-				{Material.STICK.getId(), 0, 1, -1}
+				{type.getId(), -1, 0, 1},
+				{tool.getId(), -1, 0, 1},
+				{Material.STICK.getId(), -1, 0, 1}
 				};
-		if (checkVerticalItems(items)) { return true; }
-		return false;
+		return checkVerticalItems(items);
 	}
 
 	private boolean armor(Material type, Material armor)
 	{
 		int[][] items = {
-				{type.getId(), 0, 1, -1},
-				{armor.getId(), 0, 1, -1}
+				{type.getId(), -1, 0, 1},
+				{armor.getId(), -1, 0, 1}
 				};
-		if (checkVerticalItems(items)) { return true; }
-		return false;
+		return checkVerticalItems(items);
 	}
 }

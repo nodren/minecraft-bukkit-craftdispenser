@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.block.Block;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.config.Configuration;
 
 import com.echo28.bukkit.craftdispenser.CraftDispenser;
@@ -43,39 +42,17 @@ public class Config extends Craft
 		{
 			if (checkConfig(config))
 			{
-				String itemStr = config.getString("craft.item", "Missing crafted-item");
-				int[] item = Items.validate(itemStr);
-				if (item[0] == -1) {
-					System.out.printf("[CraftDispenser] Invalid crafted-item: %s", itemStr);
-					return false;
-				}
-				int amount = config.getInt("craft.amount", 1);
-				short damage = (short)config.getInt("craft.damage", 0);
-				Byte data = null;
-				String dataStr = config.getString("craft.data", "null");
-				if (dataStr != null && !dataStr.toLowerCase().equals("null") && !dataStr.toLowerCase().equals("none"))
-					data = new Byte((byte)Integer.parseInt(dataStr));
+				int[][] items = Items.parseItemList(config.getStringList("craft", null));
 				
-				//System.out.printf("crafting %s %d #%d %d %d\n", itemStr, item[0], amount, damage, data);
-				
-				ItemStack itemStack = new ItemStack(item[0], amount, damage, data);
-				
-				//System.out.printf("'%s'\n", itemStack);
-				
-				CraftDispenser.dispenseItems(block, itemStack);
+				CraftDispenser.dispenseItems(block, Items.createItemStacks(items));
 				
 				
-				int[][] outputItems = parseItemList(config.getStringList("output-items", null));
+				int[][] outputItems = Items.parseItemList(config.getStringList("output-items", null));
 				if (outputItems != null && outputItems.length == 9) {
 					for (int i = 0; i < 9; i++) {
-						item = outputItems[i];
+						int[] item = outputItems[i];
 						if (item[0] != 0 && item[0] != -1) {
-							if (item[3] == -1)
-								data = null;
-							else
-								data = new Byte((byte)item[3]);
-							
-							inventory.setItem(i, new ItemStack(item[0], item[2], (short)0, data));
+							inventory.setItem(i, Items.createItemStack(item));
 						}
 					}
 				}
@@ -89,10 +66,10 @@ public class Config extends Craft
 	private boolean checkConfig(Configuration config)
 	{
 		if (config.getProperty("input-items-vertical") != null) {
-			return checkVerticalItems(parseItemList(config.getStringList("input-items-vertical", null)));
+			return checkVerticalItems(Items.parseItemList(config.getStringList("input-items-vertical", null)));
 		}
 		if (config.getProperty("input-items") != null) {
-			return checkCustomItems(parseItemList(config.getStringList("input-items", null)));
+			return checkCustomItems(Items.parseItemList(config.getStringList("input-items", null)));
 		}
 		return false;
 	}

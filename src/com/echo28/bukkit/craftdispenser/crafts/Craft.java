@@ -8,7 +8,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.Dispenser;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.MaterialData;
 
 import com.echo28.bukkit.craftdispenser.CraftDispenser;
 import com.echo28.bukkit.craftdispenser.Items;
@@ -79,22 +78,22 @@ abstract public class Craft
 		
 		if (items.length == 2) {
 			for (int i = 0; i < 6; i++){
-				if(itemMatchesStack(items[0], inventory.getItem(i)) &&
-				   itemMatchesStack(items[1], inventory.getItem(i+3))) {
-					newSubtractItem(i, items[0][2]);
-					newSubtractItem(i+1, items[1][2]);
+				if(Items.itemMatchesStack(items[0], inventory.getItem(i)) &&
+						Items.itemMatchesStack(items[1], inventory.getItem(i+3))) {
+					newSubtractItem(i, items[0][3]);
+					newSubtractItem(i+3, items[1][3]);
 					return true;
 				}
 			}
 			return false;
 		} else if (items.length == 3) {
 			for (int i = 0; i < 3; i++){
-				if(itemMatchesStack(items[0], inventory.getItem(i)) &&
-				   itemMatchesStack(items[1], inventory.getItem(i+3)) &&
-				   itemMatchesStack(items[2], inventory.getItem(i+6))) {
-					newSubtractItem(i, items[0][2]);
-					newSubtractItem(i+3, items[1][2]);
-					newSubtractItem(i+6, items[2][2]);
+				if(Items.itemMatchesStack(items[0], inventory.getItem(i)) &&
+						Items.itemMatchesStack(items[1], inventory.getItem(i+3)) &&
+						Items.itemMatchesStack(items[2], inventory.getItem(i+6))) {
+					newSubtractItem(i, items[0][3]);
+					newSubtractItem(i+3, items[1][3]);
+					newSubtractItem(i+6, items[2][3]);
 					return true;
 				}
 			}
@@ -114,8 +113,8 @@ abstract public class Craft
 			if (item[0] == 0)
 				continue;
 			
-			if (itemMatchesStack(item, inventory.getItem(i)))
-				slotsToSubtract[i] = item[2];
+			if (Items.itemMatchesStack(item, inventory.getItem(i)))
+				slotsToSubtract[i] = item[3];
 			else
 				return false;
 		}
@@ -184,36 +183,5 @@ abstract public class Craft
 		}
 	}
 	
-	public int[][] parseItemList(List<String> itemsList)
-	{
-		int[][] items = new int[itemsList.size()][];
-		
-		for (int i = 0; i < itemsList.size(); i++)
-			items[i] = parseItem(itemsList.get(i));
-		
-		return items;
-	}
 	
-	public static int[] parseItem(String item) {
-		int numItems = 1;
-		int data = -1;
-		if (item.indexOf(':') != -1) {
-			String[] parts = item.split(":");
-			item = parts[0];
-			numItems = Integer.parseInt(parts[1]);
-			if (parts.length > 2)
-				data = Byte.parseByte(parts[2]);
-		}
-		int[] itemID = Items.validate(item);
-		return new int[] {itemID[0], itemID[1], numItems, data};
-	}
-	
-	public static boolean itemMatchesStack(int[] item, ItemStack itemstack) {
-		if (itemstack.getTypeId() == item[0] && itemstack.getAmount() >= item[2]) {
-			MaterialData matdat = itemstack.getData();
-			if (matdat == null || matdat.getData() == item[1]) 
-				return true;
-		}
-		return false;
-	}
 }
