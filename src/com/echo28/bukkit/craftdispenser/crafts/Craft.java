@@ -8,8 +8,10 @@ import org.bukkit.block.Block;
 import org.bukkit.block.Dispenser;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.MaterialData;
 
 import com.echo28.bukkit.craftdispenser.CraftDispenser;
+import com.echo28.bukkit.craftdispenser.Items;
 
 
 abstract public class Craft
@@ -43,6 +45,17 @@ abstract public class Craft
 		}
 		return true;
 	}
+	
+	public int countAir()
+	{
+		int airCount = 0;
+		for (int i = 0; i < 9; i++)
+		{
+			if (inventory.getItem(i).getType() == Material.AIR)
+				airCount += 1;
+		}
+		return airCount;
+	}
 
 	public boolean isAir(Integer[] slots)
 	{
@@ -58,81 +71,57 @@ abstract public class Craft
 		return true;
 	}
 
-	public boolean craftUpToDown(Material[] mats)
+	protected boolean checkVerticalItems(int[][] items)
 	{
-		if (mats.length == 1) { return inventory.contains(mats[0]); }
-		if (mats.length == 2) { return craftUpToDownTwo(mats); }
-		if (mats.length != 3) { return false; }
-		for (int i = 0; i <= 2; i++)
-		{
-			if (inventory.getItem(i).getType() == mats[0])
-			{
-				if (inventory.getItem(i + 3).getType() == mats[1])
-				{
-					if (inventory.getItem(i + 6).getType() == mats[2])
-					{
-						Integer[] slots =
-						{ i, i + 3, i + 6 };
-						if (isAirExcept(slots))
-						{
-							subtractItem(i);
-							subtractItem(i + 3);
-							subtractItem(i + 6);
-							return true;
-						}
-					}
+		if (countAir() != (9 - items.length))
+			return false;
+		
+		
+		if (items.length == 2) {
+			for (int i = 0; i < 6; i++){
+				if(itemMatchesStack(items[0], inventory.getItem(i)) &&
+				   itemMatchesStack(items[1], inventory.getItem(i+3))) {
+					newSubtractItem(i, items[0][2]);
+					newSubtractItem(i+1, items[1][2]);
+					return true;
 				}
 			}
+			return false;
+		} else if (items.length == 3) {
+			for (int i = 0; i < 3; i++){
+				if(itemMatchesStack(items[0], inventory.getItem(i)) &&
+				   itemMatchesStack(items[1], inventory.getItem(i+3)) &&
+				   itemMatchesStack(items[2], inventory.getItem(i+6))) {
+					newSubtractItem(i, items[0][2]);
+					newSubtractItem(i+3, items[1][2]);
+					newSubtractItem(i+6, items[2][2]);
+					return true;
+				}
+			}
+			return false;
 		}
+		
 		return false;
 	}
-
-	private boolean craftUpToDownTwo(Material[] mats)
+	
+	protected boolean checkCustomItems(int[][] items)
 	{
-		Integer[] topRow =
-		{ 0, 1, 2 };
-		if (isAir(topRow))
+		int[] slotsToSubtract = new int[9];
+		for (int i = 0; i < 9; i++)
 		{
-			for (int i = 0; i <= 1; i++)
-			{
-				if (inventory.getItem(i + 3).getType() == mats[0])
-				{
-					if (inventory.getItem(i + 6).getType() == mats[1])
-					{
-						Integer[] slots =
-						{ i + 3, i + 6 };
-						if (isAirExcept(slots))
-						{
-							subtractItem(i + 3);
-							subtractItem(i + 6);
-							return true;
-						}
-					}
-				}
-			}
+			int[] item = items[i];
+			
+			if (item[0] == 0)
+				continue;
+			
+			if (itemMatchesStack(item, inventory.getItem(i)))
+				slotsToSubtract[i] = item[2];
+			else
+				return false;
 		}
-		else
-		{
-			for (int i = 0; i <= 1; i++)
-			{
-				if (inventory.getItem(i).getType() == mats[0])
-				{
-					if (inventory.getItem(i + 3).getType() == mats[1])
-					{
-						Integer[] slots =
-						{ i, i + 3 };
-						if (isAirExcept(slots))
-						{
-							subtractItem(i);
-							subtractItem(i + 3);
-							return true;
-						}
-					}
-				}
-			}
-		}
-
-		return false;
+		
+		newSubtractItems(slotsToSubtract);
+		return true;
 	}
 
 	public void subtractItems(Integer[] slots)
@@ -157,6 +146,32 @@ abstract public class Craft
 		}
 		inventory.setItem(slot, items);
 	}
+	
+	public void newSubtractItems(int[] slots)
+	{
+		for (int slot = 0; slot < 9; slot++)
+		{
+			newSubtractItem(slot, slots[slot]);
+		}
+	}
+
+	public void newSubtractItem(int slot, int howMuch)
+	{
+		if (howMuch == 0) return;
+		ItemStack items = inventory.getItem(slot);
+		int amount = items.getAmount() - howMuch;
+		if (amount < 0) {
+			System.out.printf("%d %d %s", amount, howMuch, items.toString());
+			new Exception().printStackTrace();
+			items = null;
+		}
+		else if (amount == 0)
+			items = null;
+		else
+			items.setAmount(amount);
+		
+		inventory.setItem(slot, items);
+	}
 
 	public void emptyBucket(int slot)
 	{
@@ -167,5 +182,38 @@ abstract public class Craft
 			items = new ItemStack(Material.BUCKET, 1);
 			inventory.setItem(slot, items);
 		}
+	}
+	
+	public int[][] parseItemList(List<String> itemsList)
+	{
+		int[][] items = new int[itemsList.size()][];
+		
+		for (int i = 0; i < itemsList.size(); i++)
+			items[i] = parseItem(itemsList.get(i));
+		
+		return items;
+	}
+	
+	public static int[] parseItem(String item) {
+		int numItems = 1;
+		int data = -1;
+		if (item.indexOf(':') != -1) {
+			String[] parts = item.split(":");
+			item = parts[0];
+			numItems = Integer.parseInt(parts[1]);
+			if (parts.length > 2)
+				data = Byte.parseByte(parts[2]);
+		}
+		int[] itemID = Items.validate(item);
+		return new int[] {itemID[0], itemID[1], numItems, data};
+	}
+	
+	public static boolean itemMatchesStack(int[] item, ItemStack itemstack) {
+		if (itemstack.getTypeId() == item[0] && itemstack.getAmount() >= item[2]) {
+			MaterialData matdat = itemstack.getData();
+			if (matdat == null || matdat.getData() == item[1]) 
+				return true;
+		}
+		return false;
 	}
 }

@@ -4,13 +4,12 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.config.Configuration;
 
 import com.echo28.bukkit.craftdispenser.CraftDispenser;
+import com.echo28.bukkit.craftdispenser.Items;
 
 
 public class Config extends Craft
@@ -29,9 +28,8 @@ public class Config extends Craft
 		for (File file : plugin.getDataFolder().listFiles())
 		{
 			if (file.getName().equalsIgnoreCase("config.yml"))
-			{
 				continue;
-			}
+			
 			Configuration config = new Configuration(file);
 			config.load();
 			configs.add(config);
@@ -41,59 +39,61 @@ public class Config extends Craft
 	@Override
 	public boolean make()
 	{
-		Location location = new Location(block.getWorld(), block.getX(), block.getY(), block.getZ(), 0, 0);
 		for (Configuration config : configs)
 		{
 			if (checkConfig(config))
 			{
-				block.getWorld().dropItem(location, new ItemStack(config.getInt("crafted-item", 0), config.getInt("crafted-amount", 1)));
+				String itemStr = config.getString("craft.item", "Missing crafted-item");
+				int[] item = Items.validate(itemStr);
+				if (item[0] == -1) {
+					System.out.printf("[CraftDispenser] Invalid crafted-item: %s", itemStr);
+					return false;
+				}
+				int amount = config.getInt("craft.amount", 1);
+				short damage = (short)config.getInt("craft.damage", 0);
+				Byte data = null;
+				String dataStr = config.getString("craft.data", "null");
+				if (dataStr != null && !dataStr.toLowerCase().equals("null") && !dataStr.toLowerCase().equals("none"))
+					data = new Byte((byte)Integer.parseInt(dataStr));
+				
+				//System.out.printf("crafting %s %d #%d %d %d\n", itemStr, item[0], amount, damage, data);
+				
+				ItemStack itemStack = new ItemStack(item[0], amount, damage, data);
+				
+				//System.out.printf("'%s'\n", itemStack);
+				
+				CraftDispenser.dispenseItems(block, itemStack);
+				
+				
+				int[][] outputItems = parseItemList(config.getStringList("output-items", null));
+				if (outputItems != null && outputItems.length == 9) {
+					for (int i = 0; i < 9; i++) {
+						item = outputItems[i];
+						if (item[0] != 0 && item[0] != -1) {
+							if (item[3] == -1)
+								data = null;
+							else
+								data = new Byte((byte)item[3]);
+							
+							inventory.setItem(i, new ItemStack(item[0], item[2], (short)0, data));
+						}
+					}
+				}
+				
 				return true;
 			}
 		}
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	private boolean checkConfig(Configuration config)
 	{
-		if (config.getString("craft-type").equalsIgnoreCase("up-down")) { return checkUpDownConfig(config); }
-		if (config.getString("craft-type").equalsIgnoreCase("custom")) { return checkCustomConfig(config); }
+		if (config.getProperty("input-items-vertical") != null) {
+			return checkVerticalItems(parseItemList(config.getStringList("input-items-vertical", null)));
+		}
+		if (config.getProperty("input-items") != null) {
+			return checkCustomItems(parseItemList(config.getStringList("input-items", null)));
+		}
 		return false;
 	}
-
-	private boolean checkUpDownConfig(Configuration config)
-	{
-		List<Integer> mats = config.getIntList("materials", null);
-		List<Material> materials = new ArrayList<Material>();
-		int i = 0;
-		for (int mat : mats)
-		{
-			materials.add(Material.getMaterial(mat));
-			i++;
-		}
-
-		Material[] materialArray = new Material[materials.size()];
-		materials.toArray(materialArray);
-		return craftUpToDown(materialArray);
-	}
-
-	private boolean checkCustomConfig(Configuration config)
-	{
-		List<Integer> slotsToEmpty = new ArrayList<Integer>();
-		for (int i = 0; i <= 8; i++)
-		{
-			int item = config.getInt("material-" + (i + 1), 0);
-			if (item == 0)
-			{
-				continue;
-			}
-			slotsToEmpty.add(i);
-			if (inventory.getItem(i).getTypeId() != item) { return false; }
-		}
-		Integer[] slots = new Integer[slotsToEmpty.size()];
-		slotsToEmpty.toArray(slots);
-		subtractItems(slots);
-		return true;
-	}
-
 }
