@@ -27,7 +27,6 @@ import com.echo28.bukkit.craftdispenser.crafts.CraftRepair;
 public class CraftDispenser extends JavaPlugin
 {
 	private final CraftDispenserBlockListener blockListener = new CraftDispenserBlockListener(this);
-	//private final CraftDispenserServerListener serverListener = new CraftDispenserServerListener(this);
 	private final Logger log = Logger.getLogger("CraftDispenser");
 
 	public Boolean repairDiamond = true;
@@ -38,7 +37,6 @@ public class CraftDispenser extends JavaPlugin
 	public Boolean repairWood = true;
 	public Boolean hellBlocks = true;
 	
-	//public General general = null;
 	
 	
 
@@ -65,7 +63,6 @@ public class CraftDispenser extends JavaPlugin
 		repairStone = getConfiguration().getBoolean("repair-stone", true);
 		repairLeather = getConfiguration().getBoolean("repair-leather", true);
 		repairWood = getConfiguration().getBoolean("repair-wood", true);
-		//hellBlocks = getConfiguration().getBoolean("hell-blocks", true);
 	}
 
 	public void onDisable()

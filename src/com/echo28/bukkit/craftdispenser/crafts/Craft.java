@@ -1,8 +1,5 @@
 package com.echo28.bukkit.craftdispenser.crafts;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Dispenser;
@@ -29,21 +26,6 @@ abstract public class Craft
 	}
 
 	abstract public boolean make();
-
-	public boolean isAirExcept(Integer[] slots)
-	{
-		List<Integer> ints = Arrays.asList(slots);
-
-		for (int i = 0; i < 9; i++)
-		{
-			if (ints.contains(i))
-			{
-				continue;
-			}
-			if (inventory.getItem(i).getType() != Material.AIR) { return false; }
-		}
-		return true;
-	}
 	
 	public int countAir()
 	{
@@ -54,20 +36,6 @@ abstract public class Craft
 				airCount += 1;
 		}
 		return airCount;
-	}
-
-	public boolean isAir(Integer[] slots)
-	{
-		return isMaterial(slots, Material.AIR);
-	}
-
-	public boolean isMaterial(Integer[] slots, Material mat)
-	{
-		for (int slot : slots)
-		{
-			if (inventory.getItem(slot).getType() != mat) { return false; }
-		}
-		return true;
 	}
 
 	protected boolean checkVerticalItems(int[][] items)
@@ -122,29 +90,6 @@ abstract public class Craft
 		newSubtractItems(slotsToSubtract);
 		return true;
 	}
-
-	public void subtractItems(Integer[] slots)
-	{
-		for (int slot : slots)
-		{
-			subtractItem(slot);
-		}
-	}
-
-	public void subtractItem(int slot)
-	{
-		ItemStack items;
-		items = inventory.getItem(slot);
-		if (items.getAmount() == 1)
-		{
-			items = null;
-		}
-		else if (items.getAmount() > 1)
-		{
-			items.setAmount(items.getAmount() - 1);
-		}
-		inventory.setItem(slot, items);
-	}
 	
 	public void newSubtractItems(int[] slots)
 	{
@@ -172,7 +117,7 @@ abstract public class Craft
 		inventory.setItem(slot, items);
 	}
 
-	public void emptyBucket(int slot)
+	/*public void emptyBucket(int slot)
 	{
 		ItemStack items;
 		items = inventory.getItem(slot);
@@ -181,7 +126,6 @@ abstract public class Craft
 			items = new ItemStack(Material.BUCKET, 1);
 			inventory.setItem(slot, items);
 		}
-	}
-	
+	}*/
 	
 }

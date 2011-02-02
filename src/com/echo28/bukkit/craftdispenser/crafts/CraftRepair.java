@@ -73,7 +73,10 @@ public class CraftRepair extends Craft
 	
 	private boolean makeTools(Material type, Material[] tools) {
 		for (Material tool : tools) {
-			if (this.tools(type, tool)) {
+			if (checkVerticalItems(new int[][] {
+					{type.getId(), -1, 0, 1},
+					{tool.getId(), -1, 0, 1},
+					{Material.STICK.getId(), -1, 0, 1} })) {
 				CraftDispenser.dispenseItems(block, new ItemStack(tool, 1));
 				return true;
 			}
@@ -82,30 +85,13 @@ public class CraftRepair extends Craft
 	}
 	private boolean makeArmors(Material type, Material[] armors) {
 		for (Material armor : armors) {
-			if (this.armor(type, armor)) {
+			if (checkVerticalItems(new int[][] {
+					{type.getId(), -1, 0, 1},
+					{armor.getId(), -1, 0, 1} })) {
 				CraftDispenser.dispenseItems(block, new ItemStack(armor, 1));
 				return true;
 			}
 		}
 		return false;
-	}
-
-	private boolean tools(Material type, Material tool)
-	{
-		int[][] items = {
-				{type.getId(), -1, 0, 1},
-				{tool.getId(), -1, 0, 1},
-				{Material.STICK.getId(), -1, 0, 1}
-				};
-		return checkVerticalItems(items);
-	}
-
-	private boolean armor(Material type, Material armor)
-	{
-		int[][] items = {
-				{type.getId(), -1, 0, 1},
-				{armor.getId(), -1, 0, 1}
-				};
-		return checkVerticalItems(items);
 	}
 }

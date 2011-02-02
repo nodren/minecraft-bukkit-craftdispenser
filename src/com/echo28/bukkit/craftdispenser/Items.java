@@ -101,17 +101,6 @@ public class Items {
     }
 
     /**
-     * Sets the item name inside of the items array and stores it inside our database.
-     *
-     * @param id
-     * @param name
-     */
-    public static void setName(String id, String name) {
-    	items.put(id, name);
-    	ItemsiProp.setString(id, name);
-    }
-
-    /**
      * Checks whether a player has the required amount of items or not.
      *
      * @param player
@@ -241,20 +230,6 @@ public class Items {
 		return items;
 	}
 	
-	/*public static int[] parseItem(String item) {
-		int numItems = 1;
-		int damage = -1;
-		if (item.indexOf(':') != -1) {
-			String[] parts = item.split(":");
-			item = parts[0];
-			numItems = Integer.parseInt(parts[1]);
-			if (parts.length > 2)
-				damage = Integer.parseInt(parts[2]);
-		}
-		int[] itemID = validate(item);
-		return new int[] {itemID[0], itemID[1], numItems, damage};
-	}*/
-	
 	public static boolean itemMatchesStack(int[] item, ItemStack itemstack) {
 		if (itemstack.getTypeId() == item[0] && itemstack.getAmount() >= item[3]) {
 			MaterialData matdat = itemstack.getData();
@@ -303,99 +278,8 @@ public class Items {
     	
     	return ret;
     }
-		/*int[] ret = new int[]{-1, -1};
-		
-		item = item.replaceAll("\\s+", "");
-		
-		try {
-			ret[0] = Integer.valueOf(item);
-		} catch (NumberFormatException e) {
-			String val = "";
-			for (String id : items.keySet()) {
-				if(id.equalsIgnoreCase(item)){
-					val = items.get(id);
-					//General.log.info("Equals key: " + item + "=" + val);
-				} else if(items.get(id).equalsIgnoreCase(item)) {
-					val = id;
-					//General.log.info("Equals val: " + val + "=" + item);
-				}
-			}
-			if (val == "")
-				return ret;
-			//General.log.info("Resultant name: " + (val.isEmpty()?"<empty>":val));
-			if (val.contains(",")) {
-				String[] split = val.split(",");
-				try {
-					ret[0] = Integer.valueOf(split[0]);
-				} catch(NumberFormatException e2) {
-					//System.out.printf("1: %s, %s\n", val, split[0]);
-					ret[0] = -1;
-				}
-				try {
-					ret[1] = Integer.valueOf(split[1]);
-				} catch(NumberFormatException e2) {
-					//System.out.printf("2: %s, %s\n", val, split[0]);
-					ret[1] = 0;
-				}
-			} else {
-				try {
-					ret[0] = Integer.valueOf(val);
-				} catch(NumberFormatException e2) {
-					//System.out.printf("3: '%s' '%s'\n", val, item);
-					//e2.printStackTrace();
-					ret[0] = -1;
-				}
-			}
-	
-			if (ret[0] == -1) {
-				return ret;
-			}
-		}
-	
-		if (!checkID(ret[0])) {
-			ret[0] = -1;
-			return ret;
-		} else {
-			return ret;
-		}
-    }*/
 
-    /**
-     * Validate the string for an item
-     *
-     * @param item
-     * @return -1 if false, type if true.
-     */
-    public static int validateGrabType(String item) {
-		int itemId = -1;
-		int itemType = -1;
-	
-	
-		try {
-		    itemId = Integer.valueOf(item);
-		} catch (NumberFormatException e) {
-		    for (String id : items.keySet()) {
-			if (items.get(id).equalsIgnoreCase(item)) {
-			    if (id.contains(",")) {
-				itemId = Integer.valueOf(id.split(",")[0]);
-				itemType = Integer.valueOf(id.split(",")[1]);
-			    }
-			}
-		    }
-	
-		    if (itemId == -1) {
-			return -1;
-		    }
-		}
-	
-		if (!checkID(itemId)) {
-		    return -1;
-		} else if (!validateType(itemId, itemType)) {
-		    return -1;
-		} else {
-		    return itemType;
-		}
-    }
+   
 
     public static boolean validateType(int id, int type) {
 		if (type == -1 || type == 0) {
