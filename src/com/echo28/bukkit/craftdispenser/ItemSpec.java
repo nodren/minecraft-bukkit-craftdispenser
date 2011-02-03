@@ -42,7 +42,7 @@ public class ItemSpec {
     	return itemstacks;
     }
     
-    public static ItemSpec[] parseItemList(List<String> itemsList)
+    public static ItemSpec[] parseItems(List<String> itemsList)
 	{
 		ItemSpec[] items = new ItemSpec[itemsList.size()];
 		
@@ -79,7 +79,6 @@ public class ItemSpec {
     		Material mat = Material.matchMaterial(type);
     		if (mat != null)
     			ret.id = mat.getId();
-    		
     		
 			try {
 				ret.data = Byte.parseByte(m.group(2));

@@ -1,5 +1,7 @@
 package com.echo28.bukkit.craftdispenser.crafts;
 
+import java.util.logging.Logger;
+
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Dispenser;
@@ -16,24 +18,34 @@ abstract public class Craft
 	protected Block block = null;
 	protected Dispenser dispenser = null;
 	protected Inventory inventory;
+	protected final Logger log = Logger.getLogger("minecraft");
 
-	public Craft(CraftDispenser plugin, Block block)
+	public Craft(CraftDispenser plugin)
 	{
 		this.plugin = plugin;
-		this.block = (Block) block;
+	}
+
+	public void load(Block block)
+	{
+		this.block = block;
 		this.dispenser = (Dispenser) this.block.getState();
 		this.inventory = this.dispenser.getInventory();
 	}
 
+	public boolean make(Block block)
+	{
+		load(block);
+		return make();
+	}
+
 	abstract public boolean make();
-	
+
 	public int countAir()
 	{
 		int airCount = 0;
 		for (int i = 0; i < 9; i++)
 		{
-			if (inventory.getItem(i).getType() == Material.AIR)
-				airCount += 1;
+			if (inventory.getItem(i).getType() == Material.AIR) airCount += 1;
 		}
 		return airCount;
 	}
@@ -60,14 +72,14 @@ abstract public class Craft
 						items[1].matchesStack(inventory.getItem(i+3)) &&
 						items[2].matchesStack(inventory.getItem(i+6))) {
 					newSubtractItem(i, items[0].amount);
-					newSubtractItem(i+3, items[1].amount);
-					newSubtractItem(i+6, items[2].amount);
+					newSubtractItem(i + 3, items[1].amount);
+					newSubtractItem(i + 6, items[2].amount);
 					return true;
 				}
 			}
 			return false;
 		}
-		
+
 		return false;
 	}
 	
@@ -86,11 +98,11 @@ abstract public class Craft
 			else
 				return false;
 		}
-		
+
 		newSubtractItems(slotsToSubtract);
 		return true;
 	}
-	
+
 	public void newSubtractItems(int[] slots)
 	{
 		for (int slot = 0; slot < 9; slot++)
@@ -104,7 +116,8 @@ abstract public class Craft
 		if (howMuch == 0) return;
 		ItemStack items = inventory.getItem(slot);
 		int amount = items.getAmount() - howMuch;
-		if (amount < 0) {
+		if (amount < 0)
+		{
 			System.out.printf("%d %d %s", amount, howMuch, items.toString());
 			new Exception().printStackTrace();
 			items = null;
@@ -113,19 +126,32 @@ abstract public class Craft
 			items = null;
 		else
 			items.setAmount(amount);
-		
+
 		inventory.setItem(slot, items);
 	}
 
-	/*public void emptyBucket(int slot)
+	public void dispenseItems(Block block, ItemStack dispenseItem)
 	{
-		ItemStack items;
-		items = inventory.getItem(slot);
-		if ((items.getType() == Material.LAVA_BUCKET) || (items.getType() == Material.WATER_BUCKET) || (items.getType() == Material.MILK_BUCKET))
+		dispenseItems(block, new ItemStack[]
+		{ dispenseItem });
+	}
+
+	public void dispenseItems(Block block, ItemStack[] dispenseItems)
+	{
+		Dispenser cd = (Dispenser) block.getState();
+		ItemStack[] contents = cd.getInventory().getContents();
+		ItemStack[] dispenseContents = new ItemStack[9];
+
+		int totalItems = 0;
+		for (int i = 0; i < dispenseItems.length; i++)
 		{
-			items = new ItemStack(Material.BUCKET, 1);
-			inventory.setItem(slot, items);
+			totalItems += dispenseItems[i].getAmount();
+			dispenseContents[i] = dispenseItems[i];
 		}
-	}*/
-	
+
+		cd.getInventory().setContents(dispenseContents);
+		for (int i = 0; i < totalItems; i++)
+			cd.dispense();
+		cd.getInventory().setContents(contents);
+	}
 }

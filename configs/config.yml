@@ -4,4 +4,4 @@ repair-iron: true
 repair-stone: true
 repair-leather: true
 repair-wood: true
-
+control-block: wool
