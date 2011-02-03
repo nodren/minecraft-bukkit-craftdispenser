@@ -4,30 +4,33 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginLoader;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.echo28.bukkit.craftdispenser.crafts.Config;
+import com.echo28.bukkit.craftdispenser.crafts.CraftConfig;
 import com.echo28.bukkit.craftdispenser.crafts.CraftRepair;
 
 
 /**
  * CraftDispenser for Bukkit
  * 
+ * Huge thanks to revcompgeek for his hard work
+ * 
  * @author Nodren
+ * @author revcompgeek
  */
 public class CraftDispenser extends JavaPlugin
 {
 	private final CraftDispenserBlockListener blockListener = new CraftDispenserBlockListener(this);
-	private final Logger log = Logger.getLogger("CraftDispenser");
+	private final Logger log = Logger.getLogger("Minecraft");
 
 	public Boolean repairDiamond = true;
 	public Boolean repairGold = true;
@@ -36,9 +39,10 @@ public class CraftDispenser extends JavaPlugin
 	public Boolean repairLeather = true;
 	public Boolean repairWood = true;
 	public Boolean hellBlocks = true;
-	
-	
-	
+	private String controlBlock = "wool";
+
+	private CraftConfig configCraft;
+	private CraftRepair repairCraft;
 
 	public CraftDispenser(PluginLoader pluginLoader, Server instance, PluginDescriptionFile desc, File folder, File plugin, ClassLoader cLoader)
 	{
@@ -63,6 +67,7 @@ public class CraftDispenser extends JavaPlugin
 		repairStone = getConfiguration().getBoolean("repair-stone", true);
 		repairLeather = getConfiguration().getBoolean("repair-leather", true);
 		repairWood = getConfiguration().getBoolean("repair-wood", true);
+		controlBlock = getConfiguration().getString("control-block", "wool");
 	}
 
 	public void onDisable()
@@ -74,31 +79,15 @@ public class CraftDispenser extends JavaPlugin
 	{
 		PluginManager pm = getServer().getPluginManager();
 		pm.registerEvent(Event.Type.REDSTONE_CHANGE, blockListener, Priority.Highest, this);
+		loadCrafts();
 
 		log.info(getDescription().getName() + " " + getDescription().getVersion() + " loaded.");
-		
-		Items.setupItems();
 	}
-	
-	public static void dispenseItems(Block block, ItemStack dispenseItem) {
-		dispenseItems(block, new ItemStack[] {dispenseItem});
-	}
-	
-	public static void dispenseItems(Block block, ItemStack[] dispenseItems) {
-		org.bukkit.craftbukkit.block.CraftDispenser cd = new org.bukkit.craftbukkit.block.CraftDispenser(block);
-		ItemStack[] contents = cd.getInventory().getContents();
-		ItemStack[] dispenseContents = new ItemStack[9];
-		
-		int totalItems = 0;
-		for (int i = 0; i < dispenseItems.length; i++) {
-			totalItems += dispenseItems[i].getAmount();
-			dispenseContents[i] = dispenseItems[i];
-		}
-		
-		cd.getInventory().setContents(dispenseContents);
-		for (int i = 0; i < totalItems; i++)
-			cd.dispense();
-		cd.getInventory().setContents(contents);
+
+	private void loadCrafts()
+	{
+		configCraft = new CraftConfig(this);
+		repairCraft = new CraftRepair(this);
 	}
 
 	public boolean isNextToDispenser(Block block)
@@ -129,15 +118,14 @@ public class CraftDispenser extends JavaPlugin
 		Block b = block.getFace(BlockFace.DOWN);
 		if (b != null)
 		{
-			if (b.getType().name() == "WOOL") { return true; }
+			if (Material.matchMaterial(controlBlock).equals(b.getType())) { return true; }
 		}
 		return false;
 	}
 
-	
 	public void runCrafts(Block block)
 	{
-		if (new Config(this, block).make()) { return; }
-		if (new CraftRepair(this, block).make()) { return; }
+		if (repairCraft.make(block)) { return; }
+		if (configCraft.make(block)) { return; }
 	}
 }
