@@ -1,6 +1,6 @@
 
 craft:
-    - soulsand * 8
+    - soul sand * 8
 
 input-items:
     - dirt

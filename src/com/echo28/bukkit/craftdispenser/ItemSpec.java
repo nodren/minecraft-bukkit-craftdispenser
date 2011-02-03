@@ -9,36 +9,41 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
 
 
-public class ItemSpec {
+public class ItemSpec
+{
 	public int id = 0;
 	public byte data = -1;
 	public short damage = 0;
 	public int amount = 1;
 
-	public ItemSpec() {
+	public ItemSpec()
+	{
 	}
 
-	public ItemSpec(int id) {
+	public ItemSpec(int id)
+	{
 		this.id = id;
 	}
 
-	public ItemSpec(int id, byte data) {
+	public ItemSpec(int id, byte data)
+	{
 		this.id = id;
 		this.data = data;
 	}
 
-	public ItemSpec(int id, int amount) {
+	public ItemSpec(int id, int amount)
+	{
 		this.id = id;
 		this.amount = amount;
 	}
-	
 
-	public ItemStack createItemStack() {
-		return new ItemStack(id, amount, (short) damage, data == -1 ? null
-				: new Byte(data));
+	public ItemStack createItemStack()
+	{
+		return new ItemStack(id, amount, (short) damage, data == -1 ? null : new Byte(data));
 	}
 
-	public static ItemStack[] createItemStacks(ItemSpec[] items) {
+	public static ItemStack[] createItemStacks(ItemSpec[] items)
+	{
 		ItemStack[] itemstacks = new ItemStack[items.length];
 
 		for (int i = 0; i < items.length; i++)
@@ -47,7 +52,8 @@ public class ItemSpec {
 		return itemstacks;
 	}
 
-	public static ItemSpec[] parseItems(List<String> itemsList) throws BadItemException {
+	public static ItemSpec[] parseItems(List<String> itemsList) throws BadItemException
+	{
 		ItemSpec[] items = new ItemSpec[itemsList.size()];
 
 		for (int i = 0; i < itemsList.size(); i++)
@@ -56,11 +62,12 @@ public class ItemSpec {
 		return items;
 	}
 
-	public boolean matchesStack(ItemStack itemstack) {
-		if (itemstack.getTypeId() == id && itemstack.getAmount() >= amount) {
+	public boolean matchesStack(ItemStack itemstack)
+	{
+		if (itemstack.getTypeId() == id && itemstack.getAmount() >= amount)
+		{
 			MaterialData matdat = itemstack.getData();
-			if (matdat == null || matdat.getData() == data)
-				return true;
+			if (matdat == null || matdat.getData() == data) return true;
 		}
 		return false;
 	}
@@ -71,43 +78,56 @@ public class ItemSpec {
 	 * @param itemStr
 	 * @return {id, data, damage, amount}
 	 */
-	private static Pattern itemPattern = Pattern
-			.compile("([a-zA-Z ]+|\\d+)(?:\\s*\\.\\s*(\\d+))?(?:\\s*,\\s*(\\d+))?(?:\\s*\\*\\s*(\\d+))?");
+	private static Pattern itemPattern = Pattern.compile("([a-zA-Z ]+|\\d+)(?:\\s*\\.\\s*(\\d+))?(?:\\s*,\\s*(\\d+))?(?:\\s*\\*\\s*(\\d+))?");
 
-	public static ItemSpec parseItem(String itemStr) throws BadItemException {
+	public static ItemSpec parseItem(String itemStr) throws BadItemException
+	{
 		Matcher m = itemPattern.matcher(itemStr);
 
 		ItemSpec ret = new ItemSpec();
 
-		if (m.matches()) {
+		if (m.matches())
+		{
 			String type = m.group(1).trim();
 
 			Material mat = Material.matchMaterial(type);
 			if (mat != null)
 				ret.id = mat.getId();
-			else {
-				throw new BadItemException("Unknown material '"+type+"'");
+			else
+			{
+				throw new BadItemException("Unknown material '" + type + "'");
 			}
 
-			try {
+			try
+			{
 				ret.data = Byte.parseByte(m.group(2));
-			} catch (NumberFormatException e) {
+			}
+			catch (NumberFormatException e)
+			{
 				// do nothing
 			}
-			try {
+			try
+			{
 				ret.damage = Short.parseShort(m.group(3));
-			} catch (NumberFormatException e) {
+			}
+			catch (NumberFormatException e)
+			{
 				// do nothing
 			}
-			try {
+			try
+			{
 				ret.amount = Integer.parseInt(m.group(4));
-			} catch (NumberFormatException e) {
+			}
+			catch (NumberFormatException e)
+			{
 				// do nothing
 			}
 			// System.out.printf("Matched '%s': {%d, %d, %d, %d}\n", itemStr, ret[0], ret[1], ret[2], ret[3]);
 			return ret;
-		} else {
-			throw new BadItemException("Unknown item '"+itemStr+"'");
+		}
+		else
+		{
+			throw new BadItemException("Unknown item '" + itemStr + "'");
 		}
 	}
 }

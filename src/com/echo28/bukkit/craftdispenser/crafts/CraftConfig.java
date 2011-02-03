@@ -6,38 +6,48 @@ import com.echo28.bukkit.craftdispenser.BadItemException;
 import com.echo28.bukkit.craftdispenser.CraftDispenser;
 import com.echo28.bukkit.craftdispenser.ItemSpec;
 
-public class CraftConfig extends Craft {
+
+public class CraftConfig extends Craft
+{
 	private String name = "";
 	private ItemSpec[] items = null;
 	private ItemSpec[] craftItems = null;
 	private ItemSpec[] outputItems = null;
 	private boolean vertical = false;
 
-	public CraftConfig(CraftDispenser plugin, Configuration config, String name) throws BadItemException {
+	public CraftConfig(CraftDispenser plugin, Configuration config, String name) throws BadItemException
+	{
 		super(plugin);
-		
+
 		this.name = name;
-		
-		try {
+
+		try
+		{
 			loadConfig(config);
-		} catch (BadItemException e) {
-			log.severe(e.getMessage() + " in file '"+this.name+"'");
+		}
+		catch (BadItemException e)
+		{
+			log.severe(e.getMessage() + " in file '" + this.name + "'");
 			throw e;
 		}
 	}
 
 	@Override
-	public boolean make() {
-		if ((vertical && checkVerticalItems(items))
-				|| (!vertical && checkCustomItems(items))) {
-			//log.info("matched config "+name);
+	public boolean make()
+	{
+		if ((vertical && checkVerticalItems(items)) || (!vertical && checkCustomItems(items)))
+		{
+			// log.info("matched config "+name);
 
-			dispenseItems(block, ItemSpec.createItemStacks(craftItems));
+			dispenseItems(ItemSpec.createItemStacks(craftItems));
 
-			if (outputItems != null && outputItems.length == 9) {
-				for (int i = 0; i < 9; i++) {
+			if (outputItems != null && outputItems.length == 9)
+			{
+				for (int i = 0; i < 9; i++)
+				{
 					ItemSpec item = outputItems[i];
-					if (item.id != 0 && item.id != -1) {
+					if (item.id != 0 && item.id != -1)
+					{
 						inventory.setItem(i, item.createItemStack());
 					}
 				}
@@ -48,16 +58,18 @@ public class CraftConfig extends Craft {
 		return false;
 	}
 
-	private void loadConfig(Configuration config) throws BadItemException {
-		if (config.getProperty("input-items-vertical") != null) {
+	private void loadConfig(Configuration config) throws BadItemException
+	{
+		if (config.getProperty("input-items-vertical") != null)
+		{
 			vertical = true;
-			items = ItemSpec.parseItems(config.getStringList(
-					"input-items-vertical", null));
+			items = ItemSpec.parseItems(config.getStringList("input-items-vertical", null));
 
-		} else if (config.getProperty("input-items") != null) {
+		}
+		else if (config.getProperty("input-items") != null)
+		{
 			vertical = false;
-			items = ItemSpec.parseItems(config.getStringList("input-items",
-					null));
+			items = ItemSpec.parseItems(config.getStringList("input-items", null));
 
 		}
 		craftItems = ItemSpec.parseItems(config.getStringList("craft", null));

@@ -41,7 +41,7 @@ public class CraftDispenser extends JavaPlugin
 	public Boolean repairStone = true;
 	public Boolean repairLeather = true;
 	public Boolean repairWood = true;
-	
+
 	private Material controlBlock = Material.WOOL;
 
 	private List<CraftConfig> configCrafts = new ArrayList<CraftConfig>();
@@ -89,19 +89,22 @@ public class CraftDispenser extends JavaPlugin
 
 	private void loadCrafts()
 	{
-		for (File file : getDataFolder().listFiles()) {
-			if (file.getName().equalsIgnoreCase("config.yml"))
-				continue;
+		for (File file : getDataFolder().listFiles())
+		{
+			if (file.getName().equalsIgnoreCase("config.yml")) continue;
 
 			Configuration config = new Configuration(file);
 			config.load();
-			try {
+			try
+			{
 				configCrafts.add(new CraftConfig(this, config, file.getName()));
-			} catch (BadItemException e) {
+			}
+			catch (BadItemException e)
+			{
 				// ignore
 			}
 		}
-		//configCraft = new CraftConfig(this);
+		// configCraft = new CraftConfig(this);
 		repairCraft = new CraftRepair(this);
 	}
 
@@ -140,10 +143,11 @@ public class CraftDispenser extends JavaPlugin
 
 	public void runCrafts(Block block)
 	{
-		for (CraftConfig cc : configCrafts) {
+		for (CraftConfig cc : configCrafts)
+		{
 			if (cc.make(block)) return;
 		}
 		if (repairCraft.make(block)) return;
-		//log.info("crafts failed");
+		// log.info("crafts failed");
 	}
 }
