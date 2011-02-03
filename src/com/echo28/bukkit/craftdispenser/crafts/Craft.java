@@ -13,47 +13,57 @@ import com.echo28.bukkit.craftdispenser.ItemSpec;
 
 
 
-abstract public class Craft {
+abstract public class Craft
+{
 	protected CraftDispenser plugin;
 	protected Block block = null;
 	protected Dispenser dispenser = null;
 	protected Inventory inventory;
 	protected final Logger log = Logger.getLogger("minecraft");
 
-	public Craft(CraftDispenser plugin) {
+	public Craft(CraftDispenser plugin)
+	{
 		this.plugin = plugin;
 	}
 
-	public void load(Block block) {
+	public void load(Block block)
+	{
 		this.block = block;
 		this.dispenser = (Dispenser) this.block.getState();
 		this.inventory = this.dispenser.getInventory();
 	}
 
-	public boolean make(Block block) {
+	public boolean make(Block block)
+	{
 		load(block);
 		return make();
 	}
 
 	abstract public boolean make();
 
-	public int countAir() {
+	public int countAir()
+	{
 		int airCount = 0;
-		for (int i = 0; i < 9; i++) {
+		for (int i = 0; i < 9; i++)
+		{
 			if (inventory.getItem(i).getType() == Material.AIR)
 				airCount += 1;
 		}
 		return airCount;
 	}
 
-	protected boolean checkVerticalItems(ItemSpec[] items) {
+	protected boolean checkVerticalItems(ItemSpec[] items)
+	{
 		if (countAir() != (9 - items.length))
 			return false;
 
-		if (items.length == 2) {
-			for (int i = 0; i < 6; i++) {
+		if (items.length == 2)
+		{
+			for (int i = 0; i < 6; i++)
+			{
 				if (items[0].matchesItemStack(inventory.getItem(i))
-				    && items[1].matchesItemStack(inventory.getItem(i + 3))) {
+				    && items[1].matchesItemStack(inventory.getItem(i + 3)))
+				{
 					subtractItem(i, items[0].amount);
 					subtractItem(i + 3, items[1].amount);
 					return true;
@@ -61,11 +71,14 @@ abstract public class Craft {
 			}
 			return false;
 		}
-		else if (items.length == 3) {
-			for (int i = 0; i < 3; i++) {
+		else if (items.length == 3)
+		{
+			for (int i = 0; i < 3; i++)
+			{
 				if (items[0].matchesItemStack(inventory.getItem(i))
 				    && items[1].matchesItemStack(inventory.getItem(i + 3))
-				    && items[2].matchesItemStack(inventory.getItem(i + 6))) {
+				    && items[2].matchesItemStack(inventory.getItem(i + 6)))
+				{
 					subtractItem(i, items[0].amount);
 					subtractItem(i + 3, items[1].amount);
 					subtractItem(i + 6, items[2].amount);
@@ -78,9 +91,11 @@ abstract public class Craft {
 		return false;
 	}
 
-	protected boolean checkCustomItems(ItemSpec[] items) {
+	protected boolean checkCustomItems(ItemSpec[] items)
+	{
 		int[] slotsToSubtract = new int[9];
-		for (int i = 0; i < 9; i++) {
+		for (int i = 0; i < 9; i++)
+		{
 			ItemSpec item = items[i];
 
 			if (item == null) // This shouldn't happen anymore, but just in case
@@ -101,18 +116,22 @@ abstract public class Craft {
 		return true;
 	}
 
-	public void subtractItems(int[] slots) {
-		for (int slot = 0; slot < 9; slot++) {
+	public void subtractItems(int[] slots)
+	{
+		for (int slot = 0; slot < 9; slot++)
+		{
 			subtractItem(slot, slots[slot]);
 		}
 	}
 
-	public void subtractItem(int slot, int howMuch) {
+	public void subtractItem(int slot, int howMuch)
+	{
 		if (howMuch == 0)
 			return;
 		ItemStack items = inventory.getItem(slot);
 		int amount = items.getAmount() - howMuch;
-		if (amount < 0) {
+		if (amount < 0)
+		{
 			System.out.printf("%d %d %s", amount, howMuch, items.toString());
 			new Exception().printStackTrace();
 			items = null;
@@ -125,17 +144,20 @@ abstract public class Craft {
 		inventory.setItem(slot, items);
 	}
 
-	public void dispenseItems(Block block, ItemStack dispenseItem) {
+	public void dispenseItems(Block block, ItemStack dispenseItem)
+	{
 		dispenseItems(block, new ItemStack[] { dispenseItem });
 	}
 
-	public void dispenseItems(Block block, ItemStack[] dispenseItems) {
+	public void dispenseItems(Block block, ItemStack[] dispenseItems)
+	{
 		Dispenser cd = (Dispenser) block.getState();
 		ItemStack[] contents = cd.getInventory().getContents();
 		ItemStack[] dispenseContents = new ItemStack[9];
 
 		int totalItems = 0;
-		for (int i = 0; i < dispenseItems.length; i++) {
+		for (int i = 0; i < dispenseItems.length; i++)
+		{
 			totalItems += dispenseItems[i].getAmount();
 			dispenseContents[i] = dispenseItems[i];
 		}
