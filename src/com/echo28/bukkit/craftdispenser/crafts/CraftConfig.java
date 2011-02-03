@@ -21,7 +21,7 @@ public class CraftConfig extends Craft {
 		try {
 			loadConfig(config);
 		} catch (BadItemException e) {
-			log.severe(e.getMessage() + " in file '"+name+"'");
+			log.severe(e.getMessage() + " in file '"+this.name+"'");
 			throw e;
 		}
 	}
@@ -30,7 +30,7 @@ public class CraftConfig extends Craft {
 	public boolean make() {
 		if ((vertical && checkVerticalItems(items))
 				|| (!vertical && checkCustomItems(items))) {
-			log.info("matched config "+name);
+			//log.info("matched config "+name);
 
 			dispenseItems(block, ItemSpec.createItemStacks(craftItems));
 

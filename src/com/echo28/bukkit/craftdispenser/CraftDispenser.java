@@ -144,6 +144,6 @@ public class CraftDispenser extends JavaPlugin
 			if (cc.make(block)) return;
 		}
 		if (repairCraft.make(block)) return;
-		log.info("crafts failed");
+		//log.info("crafts failed");
 	}
 }
