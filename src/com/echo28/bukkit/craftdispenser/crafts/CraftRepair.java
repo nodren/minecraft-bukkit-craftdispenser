@@ -5,6 +5,7 @@ import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 
 import com.echo28.bukkit.craftdispenser.CraftDispenser;
+import com.echo28.bukkit.craftdispenser.ItemSpec;
 
 
 public class CraftRepair extends Craft
@@ -73,10 +74,10 @@ public class CraftRepair extends Craft
 	
 	private boolean makeTools(Material type, Material[] tools) {
 		for (Material tool : tools) {
-			if (checkVerticalItems(new int[][] {
-					{type.getId(), -1, 0, 1},
-					{tool.getId(), -1, 0, 1},
-					{Material.STICK.getId(), -1, 0, 1} })) {
+			if (checkVerticalItems(new ItemSpec[] {
+					new ItemSpec(type.getId()),
+					new ItemSpec(tool.getId()),
+					new ItemSpec(Material.STICK.getId()) })) {
 				CraftDispenser.dispenseItems(block, new ItemStack(tool, 1));
 				return true;
 			}
@@ -85,9 +86,9 @@ public class CraftRepair extends Craft
 	}
 	private boolean makeArmors(Material type, Material[] armors) {
 		for (Material armor : armors) {
-			if (checkVerticalItems(new int[][] {
-					{type.getId(), -1, 0, 1},
-					{armor.getId(), -1, 0, 1} })) {
+			if (checkVerticalItems(new ItemSpec[] {
+					new ItemSpec(type.getId()),
+					new ItemSpec(armor.getId()) })) {
 				CraftDispenser.dispenseItems(block, new ItemStack(armor, 1));
 				return true;
 			}

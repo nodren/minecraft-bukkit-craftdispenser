@@ -8,7 +8,7 @@ import org.bukkit.block.Block;
 import org.bukkit.util.config.Configuration;
 
 import com.echo28.bukkit.craftdispenser.CraftDispenser;
-import com.echo28.bukkit.craftdispenser.Items;
+import com.echo28.bukkit.craftdispenser.ItemSpec;
 
 
 public class Config extends Craft
@@ -42,17 +42,17 @@ public class Config extends Craft
 		{
 			if (checkConfig(config))
 			{
-				int[][] items = Items.parseItemList(config.getStringList("craft", null));
+				ItemSpec[] items = ItemSpec.parseItemList(config.getStringList("craft", null));
 				
-				CraftDispenser.dispenseItems(block, Items.createItemStacks(items));
+				CraftDispenser.dispenseItems(block, ItemSpec.createItemStacks(items));
 				
 				
-				int[][] outputItems = Items.parseItemList(config.getStringList("output-items", null));
+				ItemSpec[] outputItems = ItemSpec.parseItemList(config.getStringList("output-items", null));
 				if (outputItems != null && outputItems.length == 9) {
 					for (int i = 0; i < 9; i++) {
-						int[] item = outputItems[i];
-						if (item[0] != 0 && item[0] != -1) {
-							inventory.setItem(i, Items.createItemStack(item));
+						ItemSpec item = outputItems[i];
+						if (item.id != 0 && item.id != -1) {
+							inventory.setItem(i, item.createItemStack());
 						}
 					}
 				}
@@ -66,10 +66,10 @@ public class Config extends Craft
 	private boolean checkConfig(Configuration config)
 	{
 		if (config.getProperty("input-items-vertical") != null) {
-			return checkVerticalItems(Items.parseItemList(config.getStringList("input-items-vertical", null)));
+			return checkVerticalItems(ItemSpec.parseItemList(config.getStringList("input-items-vertical", null)));
 		}
 		if (config.getProperty("input-items") != null) {
-			return checkCustomItems(Items.parseItemList(config.getStringList("input-items", null)));
+			return checkCustomItems(ItemSpec.parseItemList(config.getStringList("input-items", null)));
 		}
 		return false;
 	}

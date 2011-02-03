@@ -7,7 +7,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import com.echo28.bukkit.craftdispenser.CraftDispenser;
-import com.echo28.bukkit.craftdispenser.Items;
+import com.echo28.bukkit.craftdispenser.ItemSpec;
 
 
 abstract public class Craft
@@ -38,7 +38,7 @@ abstract public class Craft
 		return airCount;
 	}
 
-	protected boolean checkVerticalItems(int[][] items)
+	protected boolean checkVerticalItems(ItemSpec[] items)
 	{
 		if (countAir() != (9 - items.length))
 			return false;
@@ -46,22 +46,22 @@ abstract public class Craft
 		
 		if (items.length == 2) {
 			for (int i = 0; i < 6; i++){
-				if(Items.itemMatchesStack(items[0], inventory.getItem(i)) &&
-						Items.itemMatchesStack(items[1], inventory.getItem(i+3))) {
-					newSubtractItem(i, items[0][3]);
-					newSubtractItem(i+3, items[1][3]);
+				if(items[0].matchesStack(inventory.getItem(i)) &&
+						items[1].matchesStack(inventory.getItem(i+3))) {
+					newSubtractItem(i, items[0].amount);
+					newSubtractItem(i+3, items[1].amount);
 					return true;
 				}
 			}
 			return false;
 		} else if (items.length == 3) {
 			for (int i = 0; i < 3; i++){
-				if(Items.itemMatchesStack(items[0], inventory.getItem(i)) &&
-						Items.itemMatchesStack(items[1], inventory.getItem(i+3)) &&
-						Items.itemMatchesStack(items[2], inventory.getItem(i+6))) {
-					newSubtractItem(i, items[0][3]);
-					newSubtractItem(i+3, items[1][3]);
-					newSubtractItem(i+6, items[2][3]);
+				if(items[0].matchesStack(inventory.getItem(i)) &&
+						items[1].matchesStack(inventory.getItem(i+3)) &&
+						items[2].matchesStack(inventory.getItem(i+6))) {
+					newSubtractItem(i, items[0].amount);
+					newSubtractItem(i+3, items[1].amount);
+					newSubtractItem(i+6, items[2].amount);
 					return true;
 				}
 			}
@@ -71,18 +71,18 @@ abstract public class Craft
 		return false;
 	}
 	
-	protected boolean checkCustomItems(int[][] items)
+	protected boolean checkCustomItems(ItemSpec[] items)
 	{
 		int[] slotsToSubtract = new int[9];
 		for (int i = 0; i < 9; i++)
 		{
-			int[] item = items[i];
+			ItemSpec item = items[i];
 			
-			if (item[0] == 0)
+			if (item.id == 0)
 				continue;
 			
-			if (Items.itemMatchesStack(item, inventory.getItem(i)))
-				slotsToSubtract[i] = item[3];
+			if (item.matchesStack(inventory.getItem(i)))
+				slotsToSubtract[i] = item.amount;
 			else
 				return false;
 		}

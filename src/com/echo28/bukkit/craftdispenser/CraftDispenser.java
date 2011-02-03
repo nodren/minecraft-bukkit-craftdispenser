@@ -35,9 +35,6 @@ public class CraftDispenser extends JavaPlugin
 	public Boolean repairStone = true;
 	public Boolean repairLeather = true;
 	public Boolean repairWood = true;
-	public Boolean hellBlocks = true;
-	
-	
 	
 
 	public CraftDispenser(PluginLoader pluginLoader, Server instance, PluginDescriptionFile desc, File folder, File plugin, ClassLoader cLoader)
@@ -76,8 +73,6 @@ public class CraftDispenser extends JavaPlugin
 		pm.registerEvent(Event.Type.REDSTONE_CHANGE, blockListener, Priority.Highest, this);
 
 		log.info(getDescription().getName() + " " + getDescription().getVersion() + " loaded.");
-		
-		Items.setupItems();
 	}
 	
 	public static void dispenseItems(Block block, ItemStack dispenseItem) {
