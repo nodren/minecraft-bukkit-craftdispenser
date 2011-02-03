@@ -9,14 +9,14 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
 
 
+
 public class ItemSpec {
 	public int id = 0;
 	public byte data = -1;
 	public short damage = 0;
 	public int amount = 1;
 
-	public ItemSpec() {
-	}
+	public ItemSpec() {}
 
 	public ItemSpec(int id) {
 		this.id = id;
@@ -31,11 +31,10 @@ public class ItemSpec {
 		this.id = id;
 		this.amount = amount;
 	}
-	
+
 
 	public ItemStack createItemStack() {
-		return new ItemStack(id, amount, (short) damage, data == -1 ? null
-				: new Byte(data));
+		return new ItemStack(id, amount, (short) damage, data == -1 ? null : new Byte(data));
 	}
 
 	public static ItemStack[] createItemStacks(ItemSpec[] items) {
@@ -56,7 +55,7 @@ public class ItemSpec {
 		return items;
 	}
 
-	public boolean matchesStack(ItemStack itemstack) {
+	public boolean matchesItemStack(ItemStack itemstack) {
 		if (itemstack.getTypeId() == id && itemstack.getAmount() >= amount) {
 			MaterialData matdat = itemstack.getData();
 			if (matdat == null || matdat.getData() == data)
@@ -72,12 +71,15 @@ public class ItemSpec {
 	 * @return {id, data, damage, amount}
 	 */
 	private static Pattern itemPattern = Pattern
-			.compile("([a-zA-Z ]+|\\d+)(?:\\s*\\.\\s*(\\d+))?(?:\\s*,\\s*(\\d+))?(?:\\s*\\*\\s*(\\d+))?");
+	        .compile("([a-zA-Z ]+|\\d+)(?:\\s*\\.\\s*(\\d+))?(?:\\s*,\\s*(\\d+))?(?:\\s*\\*\\s*(\\d+))?");
 
 	public static ItemSpec parseItem(String itemStr) throws BadItemException {
-		Matcher m = itemPattern.matcher(itemStr);
-
 		ItemSpec ret = new ItemSpec();
+
+		if (itemStr.equals(""))
+			return ret; // return empty, or air, for an empty string
+
+		Matcher m = itemPattern.matcher(itemStr);
 
 		if (m.matches()) {
 			String type = m.group(1).trim();
@@ -86,28 +88,26 @@ public class ItemSpec {
 			if (mat != null)
 				ret.id = mat.getId();
 			else {
-				throw new BadItemException("Unknown material '"+type+"'");
+				throw new BadItemException("Unknown material '" + type + "'");
 			}
 
 			try {
 				ret.data = Byte.parseByte(m.group(2));
-			} catch (NumberFormatException e) {
-				// do nothing
 			}
+			catch (NumberFormatException e) {}
 			try {
 				ret.damage = Short.parseShort(m.group(3));
-			} catch (NumberFormatException e) {
-				// do nothing
 			}
+			catch (NumberFormatException e) {}
 			try {
 				ret.amount = Integer.parseInt(m.group(4));
-			} catch (NumberFormatException e) {
-				// do nothing
 			}
-			// System.out.printf("Matched '%s': {%d, %d, %d, %d}\n", itemStr, ret[0], ret[1], ret[2], ret[3]);
+			catch (NumberFormatException e) {}
+			
 			return ret;
-		} else {
-			throw new BadItemException("Unknown item '"+itemStr+"'");
+		}
+		else {
+			throw new BadItemException("Unknown item '" + itemStr + "'");
 		}
 	}
 }

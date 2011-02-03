@@ -11,6 +11,8 @@ import org.bukkit.inventory.ItemStack;
 import com.echo28.bukkit.craftdispenser.CraftDispenser;
 import com.echo28.bukkit.craftdispenser.ItemSpec;
 
+
+
 abstract public class Craft {
 	protected CraftDispenser plugin;
 	protected Block block = null;
@@ -50,19 +52,20 @@ abstract public class Craft {
 
 		if (items.length == 2) {
 			for (int i = 0; i < 6; i++) {
-				if (items[0].matchesStack(inventory.getItem(i))
-						&& items[1].matchesStack(inventory.getItem(i + 3))) {
+				if (items[0].matchesItemStack(inventory.getItem(i))
+				    && items[1].matchesItemStack(inventory.getItem(i + 3))) {
 					subtractItem(i, items[0].amount);
 					subtractItem(i + 3, items[1].amount);
 					return true;
 				}
 			}
 			return false;
-		} else if (items.length == 3) {
+		}
+		else if (items.length == 3) {
 			for (int i = 0; i < 3; i++) {
-				if (items[0].matchesStack(inventory.getItem(i))
-						&& items[1].matchesStack(inventory.getItem(i + 3))
-						&& items[2].matchesStack(inventory.getItem(i + 6))) {
+				if (items[0].matchesItemStack(inventory.getItem(i))
+				    && items[1].matchesItemStack(inventory.getItem(i + 3))
+				    && items[2].matchesItemStack(inventory.getItem(i + 6))) {
 					subtractItem(i, items[0].amount);
 					subtractItem(i + 3, items[1].amount);
 					subtractItem(i + 6, items[2].amount);
@@ -80,10 +83,15 @@ abstract public class Craft {
 		for (int i = 0; i < 9; i++) {
 			ItemSpec item = items[i];
 
-			if (item.id == 0)
+			if (item == null) // This shouldn't happen anymore, but just in case
+				return false;
+
+			ItemStack itemStack = inventory.getItem(i);
+
+			if (item.id == 0 && (itemStack == null || itemStack.getTypeId() == 0))
 				continue;
 
-			if (item.matchesStack(inventory.getItem(i)))
+			if (item.matchesItemStack(itemStack))
 				slotsToSubtract[i] = item.amount;
 			else
 				return false;
@@ -108,7 +116,8 @@ abstract public class Craft {
 			System.out.printf("%d %d %s", amount, howMuch, items.toString());
 			new Exception().printStackTrace();
 			items = null;
-		} else if (amount == 0)
+		}
+		else if (amount == 0)
 			items = null;
 		else
 			items.setAmount(amount);
