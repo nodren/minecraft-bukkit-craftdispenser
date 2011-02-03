@@ -6,6 +6,7 @@ import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockRedstoneEvent;
 
 
+
 public class CraftDispenserBlockListener extends BlockListener
 {
 	private final CraftDispenser plugin;

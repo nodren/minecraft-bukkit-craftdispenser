@@ -18,7 +18,8 @@ public class ItemSpec
 	public int amount = 1;
 
 	public ItemSpec()
-	{}
+	{
+	}
 
 	public ItemSpec(int id)
 	{
@@ -36,7 +37,6 @@ public class ItemSpec
 		this.id = id;
 		this.amount = amount;
 	}
-
 
 	public ItemStack createItemStack()
 	{
@@ -68,8 +68,7 @@ public class ItemSpec
 		if (itemstack.getTypeId() == id && itemstack.getAmount() >= amount)
 		{
 			MaterialData matdat = itemstack.getData();
-			if (matdat == null || matdat.getData() == data)
-				return true;
+			if (matdat == null || matdat.getData() == data) return true;
 		}
 		return false;
 	}
@@ -87,8 +86,7 @@ public class ItemSpec
 	{
 		ItemSpec ret = new ItemSpec();
 
-		if (itemStr.equals(""))
-			return ret; // return empty, or air, for an empty string
+		if (itemStr.equals("")) return ret; // return empty, or air, for an empty string
 
 		Matcher m = itemPattern.matcher(itemStr);
 
@@ -97,8 +95,7 @@ public class ItemSpec
 			String type = m.group(1).trim();
 
 			Material mat = Material.matchMaterial(type);
-			if (mat != null)
-				ret.id = mat.getId();
+			if (mat != null) ret.id = mat.getId();
 			else
 			{
 				throw new BadItemException("Unknown material '" + type + "'");
@@ -109,19 +106,22 @@ public class ItemSpec
 				ret.data = Byte.parseByte(m.group(2));
 			}
 			catch (NumberFormatException e)
-			{}
+			{
+			}
 			try
 			{
 				ret.damage = Short.parseShort(m.group(3));
 			}
 			catch (NumberFormatException e)
-			{}
+			{
+			}
 			try
 			{
 				ret.amount = Integer.parseInt(m.group(4));
 			}
 			catch (NumberFormatException e)
-			{}
+			{
+			}
 
 			return ret;
 		}

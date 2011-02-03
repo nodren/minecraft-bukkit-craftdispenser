@@ -46,16 +46,14 @@ abstract public class Craft
 		int airCount = 0;
 		for (int i = 0; i < 9; i++)
 		{
-			if (inventory.getItem(i).getType() == Material.AIR)
-				airCount += 1;
+			if (inventory.getItem(i).getType() == Material.AIR) airCount += 1;
 		}
 		return airCount;
 	}
 
 	protected boolean checkVerticalItems(ItemSpec[] items)
 	{
-		if (countAir() != (9 - items.length))
-			return false;
+		if (countAir() != (9 - items.length)) return false;
 
 		if (items.length == 2)
 		{
@@ -99,17 +97,14 @@ abstract public class Craft
 			ItemSpec item = items[i];
 
 			if (item == null) // This shouldn't happen anymore, but just in case
-				return false;
+			return false;
 
 			ItemStack itemStack = inventory.getItem(i);
 
-			if (item.id == 0 && (itemStack == null || itemStack.getTypeId() == 0))
-				continue;
+			if (item.id == 0 && (itemStack == null || itemStack.getTypeId() == 0)) continue;
 
-			if (item.matchesItemStack(itemStack))
-				slotsToSubtract[i] = item.amount;
-			else
-				return false;
+			if (item.matchesItemStack(itemStack)) slotsToSubtract[i] = item.amount;
+			else return false;
 		}
 
 		subtractItems(slotsToSubtract);
@@ -126,8 +121,8 @@ abstract public class Craft
 
 	public void subtractItem(int slot, int howMuch)
 	{
-		if (howMuch == 0)
-			return;
+		if (howMuch == 0) return;
+
 		ItemStack items = inventory.getItem(slot);
 		int amount = items.getAmount() - howMuch;
 		if (amount < 0)
@@ -136,20 +131,19 @@ abstract public class Craft
 			new Exception().printStackTrace();
 			items = null;
 		}
-		else if (amount == 0)
-			items = null;
-		else
-			items.setAmount(amount);
+		else if (amount == 0) items = null;
+		else items.setAmount(amount);
 
 		inventory.setItem(slot, items);
 	}
 
-	public void dispenseItems(Block block, ItemStack dispenseItem)
+	public void dispenseItems(ItemStack dispenseItem)
 	{
-		dispenseItems(block, new ItemStack[] { dispenseItem });
+		dispenseItems(new ItemStack[]
+		{ dispenseItem });
 	}
 
-	public void dispenseItems(Block block, ItemStack[] dispenseItems)
+	public void dispenseItems(ItemStack[] dispenseItems)
 	{
 		Dispenser cd = (Dispenser) block.getState();
 		ItemStack[] contents = cd.getInventory().getContents();
@@ -162,9 +156,37 @@ abstract public class Craft
 			dispenseContents[i] = dispenseItems[i];
 		}
 
-		cd.getInventory().setContents(dispenseContents);
+		inventory.clear();
+		setContents(dispenseContents);
 		for (int i = 0; i < totalItems; i++)
-			cd.dispense();
-		cd.getInventory().setContents(contents);
+		{
+			dispenser.dispense();
+		}
+		inventory.clear();
+		setContents(contents);
+	}
+
+	protected ItemStack[] getContents()
+	{
+		ItemStack[] contents = new ItemStack[9];
+		for (int i = 0; i < 9; i++)
+		{
+			contents[i] = inventory.getItem(i);
+		}
+		return contents;
+	}
+
+	protected void setContents(ItemStack[] contents)
+	{
+		int i = 0;
+		for (ItemStack item : contents)
+		{
+			if ((item != null) && (item.getType().name().equalsIgnoreCase("AIR")))
+			{
+				item = null;
+			}
+			inventory.setItem(i, item);
+			i++;
+		}
 	}
 }

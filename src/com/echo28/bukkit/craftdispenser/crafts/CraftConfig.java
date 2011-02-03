@@ -40,7 +40,7 @@ public class CraftConfig extends Craft
 		{
 			// log.info("matched config "+name);
 
-			dispenseItems(block, ItemSpec.createItemStacks(craftItems));
+			dispenseItems(ItemSpec.createItemStacks(craftItems));
 
 			if (outputItems != null && outputItems.length == 9)
 			{
@@ -66,19 +66,17 @@ public class CraftConfig extends Craft
 			vertical = true;
 			items = ItemSpec.parseItems(config.getStringList("input-items-vertical", null));
 
-			if (items.length != 2 || items.length != 3)
-				throw new BadItemException("There must be 2 or 3 items listed under input-items-vertical: not "
-				                           + Integer.toString(items.length));
-
+			if (items.length != 2 || items.length != 3) throw new BadItemException(
+			        "There must be 2 or 3 items listed under input-items-vertical: not "
+			                + Integer.toString(items.length));
 		}
 		else if (config.getProperty("input-items") != null)
 		{
 			vertical = false;
 			items = ItemSpec.parseItems(config.getStringList("input-items", null));
 
-			if (items.length != 9)
-				throw new BadItemException("There must be 9 items listed under input-items: not "
-				                           + Integer.toString(items.length));
+			if (items.length != 9) throw new BadItemException("There must be 9 items listed under input-items: not "
+			                                                  + Integer.toString(items.length));
 
 		}
 		else
@@ -86,8 +84,7 @@ public class CraftConfig extends Craft
 			throw new BadItemException("Missing input-items: or input-items-vertical:");
 		}
 		craftItems = ItemSpec.parseItems(config.getStringList("craft", null));
-		if (craftItems.length == 0)
-			throw new BadItemException("Missing craft: list");
+		if (craftItems.length == 0) throw new BadItemException("Missing craft: list");
 		outputItems = ItemSpec.parseItems(config.getStringList("output-items", null));
 	}
 }
