@@ -1,72 +1,66 @@
 package com.echo28.bukkit.craftdispenser.crafts;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.bukkit.util.config.Configuration;
 
+import com.echo28.bukkit.craftdispenser.BadItemException;
 import com.echo28.bukkit.craftdispenser.CraftDispenser;
 import com.echo28.bukkit.craftdispenser.ItemSpec;
 
+public class CraftConfig extends Craft {
+	private String name = "";
+	private ItemSpec[] items = null;
+	private ItemSpec[] craftItems = null;
+	private ItemSpec[] outputItems = null;
+	private boolean vertical = false;
 
-public class CraftConfig extends Craft
-{
-	private List<Configuration> configs = new ArrayList<Configuration>();
-
-	public CraftConfig(CraftDispenser plugin)
-	{
+	public CraftConfig(CraftDispenser plugin, Configuration config, String name) throws BadItemException {
 		super(plugin);
-
-		loadCustom();
-	}
-
-	private void loadCustom()
-	{
-		for (File file : plugin.getDataFolder().listFiles())
-		{
-			if (file.getName().equalsIgnoreCase("config.yml")) continue;
-
-			Configuration config = new Configuration(file);
-			config.load();
-			configs.add(config);
+		
+		this.name = name;
+		
+		try {
+			loadConfig(config);
+		} catch (BadItemException e) {
+			log.severe(e.getMessage() + " in file '"+name+"'");
+			throw e;
 		}
 	}
 
 	@Override
-	public boolean make()
-	{
-		for (Configuration config : configs)
-		{
-			if (checkConfig(config))
-			{
-				ItemSpec[] items = ItemSpec.parseItems(config.getStringList("craft", null));
+	public boolean make() {
+		if ((vertical && checkVerticalItems(items))
+				|| (!vertical && checkCustomItems(items))) {
+			log.info("matched config "+name);
 
-				dispenseItems(block, ItemSpec.createItemStacks(items));
+			dispenseItems(block, ItemSpec.createItemStacks(craftItems));
 
-				ItemSpec[] outputItems = ItemSpec.parseItems(config.getStringList("output-items", null));
-				if (outputItems != null && outputItems.length == 9)
-				{
-					for (int i = 0; i < 9; i++)
-					{
-						ItemSpec item = outputItems[i];
-						if (item.id != 0 && item.id != -1)
-						{
-							inventory.setItem(i, item.createItemStack());
-						}
+			if (outputItems != null && outputItems.length == 9) {
+				for (int i = 0; i < 9; i++) {
+					ItemSpec item = outputItems[i];
+					if (item.id != 0 && item.id != -1) {
+						inventory.setItem(i, item.createItemStack());
 					}
 				}
-
-				return true;
 			}
+
+			return true;
 		}
 		return false;
 	}
 
-	private boolean checkConfig(Configuration config)
-	{
-		if (config.getProperty("input-items-vertical") != null) { return checkVerticalItems(ItemSpec.parseItems(config.getStringList("input-items-vertical", null))); }
-		if (config.getProperty("input-items") != null) { return checkCustomItems(ItemSpec.parseItems(config.getStringList("input-items", null))); }
-		return false;
+	private void loadConfig(Configuration config) throws BadItemException {
+		if (config.getProperty("input-items-vertical") != null) {
+			vertical = true;
+			items = ItemSpec.parseItems(config.getStringList(
+					"input-items-vertical", null));
+
+		} else if (config.getProperty("input-items") != null) {
+			vertical = false;
+			items = ItemSpec.parseItems(config.getStringList("input-items",
+					null));
+
+		}
+		craftItems = ItemSpec.parseItems(config.getStringList("craft", null));
+		outputItems = ItemSpec.parseItems(config.getStringList("output-items", null));
 	}
 }

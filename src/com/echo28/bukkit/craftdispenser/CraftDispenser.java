@@ -2,6 +2,8 @@ package com.echo28.bukkit.craftdispenser;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.bukkit.Material;
@@ -14,6 +16,7 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginLoader;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.config.Configuration;
 
 import com.echo28.bukkit.craftdispenser.crafts.CraftConfig;
 import com.echo28.bukkit.craftdispenser.crafts.CraftRepair;
@@ -41,7 +44,7 @@ public class CraftDispenser extends JavaPlugin
 	
 	private Material controlBlock = Material.WOOL;
 
-	private CraftConfig configCraft;
+	private List<CraftConfig> configCrafts = new ArrayList<CraftConfig>();
 	private CraftRepair repairCraft;
 
 	public CraftDispenser(PluginLoader pluginLoader, Server instance, PluginDescriptionFile desc, File folder, File plugin, ClassLoader cLoader)
@@ -86,7 +89,19 @@ public class CraftDispenser extends JavaPlugin
 
 	private void loadCrafts()
 	{
-		configCraft = new CraftConfig(this);
+		for (File file : getDataFolder().listFiles()) {
+			if (file.getName().equalsIgnoreCase("config.yml"))
+				continue;
+
+			Configuration config = new Configuration(file);
+			config.load();
+			try {
+				configCrafts.add(new CraftConfig(this, config, file.getName()));
+			} catch (BadItemException e) {
+				// ignore
+			}
+		}
+		//configCraft = new CraftConfig(this);
 		repairCraft = new CraftRepair(this);
 	}
 
@@ -125,7 +140,10 @@ public class CraftDispenser extends JavaPlugin
 
 	public void runCrafts(Block block)
 	{
-		if (repairCraft.make(block)) { return; }
-		if (configCraft.make(block)) { return; }
+		for (CraftConfig cc : configCrafts) {
+			if (cc.make(block)) return;
+		}
+		if (repairCraft.make(block)) return;
+		log.info("crafts failed");
 	}
 }
