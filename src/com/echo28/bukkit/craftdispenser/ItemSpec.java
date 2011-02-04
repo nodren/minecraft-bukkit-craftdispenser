@@ -67,6 +67,7 @@ public class ItemSpec
 	{
 		if (itemstack.getTypeId() == id && itemstack.getAmount() >= amount)
 		{
+			if (data == -1) return true; // data==-1 means don't care
 			MaterialData matdat = itemstack.getData();
 			if (matdat == null || matdat.getData() == data) return true;
 		}

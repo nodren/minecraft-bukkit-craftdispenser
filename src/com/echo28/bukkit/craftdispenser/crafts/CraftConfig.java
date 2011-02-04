@@ -66,7 +66,7 @@ public class CraftConfig extends Craft
 			vertical = true;
 			items = ItemSpec.parseItems(config.getStringList("input-items-vertical", null));
 
-			if (items.length != 2 || items.length != 3) throw new BadItemException(
+			if (items.length != 2 && items.length != 3) throw new BadItemException(
 			        "There must be 2 or 3 items listed under input-items-vertical: not "
 			                + Integer.toString(items.length));
 		}
@@ -81,7 +81,7 @@ public class CraftConfig extends Craft
 		}
 		else
 		{
-			throw new BadItemException("Missing input-items: or input-items-vertical:");
+			throw new BadItemException("Missing input-items: list or input-items-vertical: list");
 		}
 		craftItems = ItemSpec.parseItems(config.getStringList("craft", null));
 		if (craftItems.length == 0) throw new BadItemException("Missing craft: list");

@@ -96,8 +96,12 @@ abstract public class Craft
 		{
 			ItemSpec item = items[i];
 
-			if (item == null) // This shouldn't happen anymore, but just in case
-			return false;
+			if (item == null)
+			{
+				// This shouldn't ever happen, but just in case
+				log.warning("null item");
+				return false;
+			}
 
 			ItemStack itemStack = inventory.getItem(i);
 
