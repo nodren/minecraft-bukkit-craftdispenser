@@ -41,6 +41,8 @@ public class CraftDispenser extends JavaPlugin
 	public Boolean repairStone = true;
 	public Boolean repairLeather = true;
 	public Boolean repairWood = true;
+	
+	public Boolean debug = false;
 
 	private Material controlBlock = Material.WOOL;
 
@@ -71,6 +73,9 @@ public class CraftDispenser extends JavaPlugin
 		repairLeather = getConfiguration().getBoolean("repair-leather", true);
 		repairWood = getConfiguration().getBoolean("repair-wood", true);
 		controlBlock = Material.matchMaterial(getConfiguration().getString("control-block", "wool"));
+		
+		debug = getConfiguration().getBoolean("debug", false);
+		if (debug) log.info("[CraftDispenser] Debugging mode enabled.");
 	}
 
 	public void onDisable()
@@ -143,11 +148,12 @@ public class CraftDispenser extends JavaPlugin
 
 	public void runCrafts(Block block)
 	{
+		if (debug) log.info("[CraftDispenser] Trying crafts...");
 		for (CraftConfig cc : configCrafts)
 		{
 			if (cc.make(block)) return;
 		}
 		if (repairCraft.make(block)) return;
-		// log.info("crafts failed");
+		if (debug) log.info("[CraftDispenser] Crafts failed");
 	}
 }

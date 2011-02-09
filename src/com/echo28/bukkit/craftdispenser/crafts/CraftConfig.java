@@ -28,9 +28,11 @@ public class CraftConfig extends Craft
 		}
 		catch (BadItemException e)
 		{
-			log.severe(e.getMessage() + " in file '" + this.name + "'");
+			log.severe("[CraftDispenser] " + e.getMessage() + " in file " + this.name + "");
 			throw e;
 		}
+		
+		if (plugin.debug) log.info("[CraftDispenser] Loaded "+(this.vertical?"vertical":"custom")+" config "+this.name);
 	}
 
 	@Override
@@ -38,7 +40,7 @@ public class CraftConfig extends Craft
 	{
 		if ((vertical && checkVerticalItems(items)) || (!vertical && checkCustomItems(items)))
 		{
-			// log.info("matched config "+name);
+			if(plugin.debug) log.info("[CraftDispenser] Matched config "+name);
 
 			dispenseItems(ItemSpec.createItemStacks(craftItems));
 
@@ -52,6 +54,8 @@ public class CraftConfig extends Craft
 						inventory.setItem(i, item.createItemStack());
 					}
 				}
+			} else {
+				if(plugin.debug) log.info("[CraftDispenser] No output items.");
 			}
 
 			return true;

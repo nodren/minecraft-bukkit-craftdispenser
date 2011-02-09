@@ -72,6 +72,9 @@ public class CraftRepair extends Craft
 			{ new ItemSpec(type.getId()), new ItemSpec(tool.getId()), new ItemSpec(Material.STICK.getId()) }))
 			{
 				dispenseItems(new ItemStack(tool, 1));
+				
+				if (plugin.debug) log.info("[CraftDispenser] Repaired " + tool.name());
+				
 				return true;
 			}
 		}
@@ -86,6 +89,9 @@ public class CraftRepair extends Craft
 			{ new ItemSpec(type.getId()), new ItemSpec(armor.getId()) }))
 			{
 				dispenseItems(new ItemStack(armor, 1));
+				
+				if (plugin.debug) log.info("[CraftDispenser] Repaired " + armor.name());
+				
 				return true;
 			}
 		}

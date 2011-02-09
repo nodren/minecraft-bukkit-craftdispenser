@@ -19,7 +19,7 @@ abstract public class Craft
 	protected Block block = null;
 	protected Dispenser dispenser = null;
 	protected Inventory inventory;
-	protected final Logger log = Logger.getLogger("minecraft");
+	protected final Logger log = Logger.getLogger("Minecraft");
 
 	public Craft(CraftDispenser plugin)
 	{
@@ -99,7 +99,7 @@ abstract public class Craft
 			if (item == null)
 			{
 				// This shouldn't ever happen, but just in case
-				log.warning("null item");
+				log.warning("[CraftDispenser] null item");
 				return false;
 			}
 
@@ -185,7 +185,7 @@ abstract public class Craft
 		int i = 0;
 		for (ItemStack item : contents)
 		{
-			if ((item != null) && (item.getType().name().equalsIgnoreCase("AIR")))
+			if ((item != null) && (item.getTypeId() == 0))
 			{
 				item = null;
 			}
