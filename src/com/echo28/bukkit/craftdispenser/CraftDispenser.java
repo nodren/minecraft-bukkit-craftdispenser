@@ -7,13 +7,10 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.bukkit.Material;
-import org.bukkit.Server;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
-import org.bukkit.plugin.PluginDescriptionFile;
-import org.bukkit.plugin.PluginLoader;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.config.Configuration;
@@ -41,7 +38,7 @@ public class CraftDispenser extends JavaPlugin
 	public Boolean repairStone = true;
 	public Boolean repairLeather = true;
 	public Boolean repairWood = true;
-	
+
 	public Boolean debug = false;
 
 	private Material controlBlock = Material.WOOL;
@@ -49,11 +46,14 @@ public class CraftDispenser extends JavaPlugin
 	private List<CraftConfig> configCrafts = new ArrayList<CraftConfig>();
 	private CraftRepair repairCraft;
 
-	public CraftDispenser(PluginLoader pluginLoader, Server instance, PluginDescriptionFile desc, File folder, File plugin, ClassLoader cLoader)
+	public void onDisable()
 	{
-		super(pluginLoader, instance, desc, folder, plugin, cLoader);
+		log.info(getDescription().getName() + " " + getDescription().getVersion() + " unloaded.");
+	}
 
-		folder.mkdirs();
+	public void onEnable()
+	{
+		getDataFolder().mkdirs();
 
 		File yml = new File(getDataFolder(), "config.yml");
 		if (!yml.exists())
@@ -73,18 +73,10 @@ public class CraftDispenser extends JavaPlugin
 		repairLeather = getConfiguration().getBoolean("repair-leather", true);
 		repairWood = getConfiguration().getBoolean("repair-wood", true);
 		controlBlock = Material.matchMaterial(getConfiguration().getString("control-block", "wool"));
-		
+
 		debug = getConfiguration().getBoolean("debug", false);
 		if (debug) log.info("[CraftDispenser] Debugging mode enabled.");
-	}
 
-	public void onDisable()
-	{
-		log.info(getDescription().getName() + " " + getDescription().getVersion() + " unloaded.");
-	}
-
-	public void onEnable()
-	{
 		PluginManager pm = getServer().getPluginManager();
 		pm.registerEvent(Event.Type.REDSTONE_CHANGE, blockListener, Priority.Highest, this);
 		loadCrafts();
