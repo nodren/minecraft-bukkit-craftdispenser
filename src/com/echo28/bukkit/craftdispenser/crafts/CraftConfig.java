@@ -7,7 +7,6 @@ import com.echo28.bukkit.craftdispenser.CraftDispenser;
 import com.echo28.bukkit.craftdispenser.ItemSpec;
 
 
-
 public class CraftConfig extends Craft
 {
 	private String name = "";
@@ -31,8 +30,8 @@ public class CraftConfig extends Craft
 			log.severe("[CraftDispenser] " + e.getMessage() + " in file " + this.name + "");
 			throw e;
 		}
-		
-		if (plugin.debug) log.info("[CraftDispenser] Loaded "+(this.vertical?"vertical":"custom")+" config "+this.name);
+
+		if (plugin.debug) log.info("[CraftDispenser] Loaded " + (this.vertical ? "vertical" : "custom") + " config " + this.name);
 	}
 
 	@Override
@@ -40,7 +39,7 @@ public class CraftConfig extends Craft
 	{
 		if ((vertical && checkVerticalItems(items)) || (!vertical && checkCustomItems(items)))
 		{
-			if(plugin.debug) log.info("[CraftDispenser] Matched config "+name);
+			if (plugin.debug) log.info("[CraftDispenser] Matched config " + name);
 
 			dispenseItems(ItemSpec.createItemStacks(craftItems));
 
@@ -54,8 +53,10 @@ public class CraftConfig extends Craft
 						inventory.setItem(i, item.createItemStack());
 					}
 				}
-			} else {
-				if(plugin.debug) log.info("[CraftDispenser] No output items.");
+			}
+			else
+			{
+				if (plugin.debug) log.info("[CraftDispenser] No output items.");
 			}
 
 			return true;
@@ -70,17 +71,15 @@ public class CraftConfig extends Craft
 			vertical = true;
 			items = ItemSpec.parseItems(config.getStringList("input-items-vertical", null));
 
-			if (items.length != 2 && items.length != 3) throw new BadItemException(
-			        "There must be 2 or 3 items listed under input-items-vertical: not "
-			                + Integer.toString(items.length));
+			if (items.length != 2 && items.length != 3)
+				throw new BadItemException("There must be 2 or 3 items listed under input-items-vertical: not " + Integer.toString(items.length));
 		}
 		else if (config.getProperty("input-items") != null)
 		{
 			vertical = false;
 			items = ItemSpec.parseItems(config.getStringList("input-items", null));
 
-			if (items.length != 9) throw new BadItemException("There must be 9 items listed under input-items: not "
-			                                                  + Integer.toString(items.length));
+			if (items.length != 9) throw new BadItemException("There must be 9 items listed under input-items: not " + Integer.toString(items.length));
 
 		}
 		else

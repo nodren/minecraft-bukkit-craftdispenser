@@ -90,15 +90,18 @@ public class CraftDispenser extends JavaPlugin
 		{
 			if (file.getName().equalsIgnoreCase("config.yml")) continue;
 
-			Configuration config = new Configuration(file);
-			config.load();
-			try
+			if (file.getName().endsWith(".yml"))
 			{
-				configCrafts.add(new CraftConfig(this, config, file.getName()));
-			}
-			catch (BadItemException e)
-			{
-				// ignore
+				Configuration config = new Configuration(file);
+				config.load();
+				try
+				{
+					configCrafts.add(new CraftConfig(this, config, file.getName()));
+				}
+				catch (BadItemException e)
+				{
+					// ignore
+				}
 			}
 		}
 		// configCraft = new CraftConfig(this);
